@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>🛡️ Door Open Behind Us — A Next-Gen Tale | Planetary Restoration Archive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An interactive starfield story for next-gen stewards. IndexedDB-saved waypoints, Habitica quests, WebLLM counsel, and a vow to leave the door open behind us.">
+<meta name="theme-color" content="#0b0f1a">
+<link rel="canonical" href="https://planetaryrestorationarchive.com/ref/crypto/sol/custom/gpt/rare/peace/engineer/hybrid">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="Planetary Restoration Archive, starfield, IndexedDB, PWA, Habitica, WebLLM, zero harm, stewardship, peace engineering">
+
+<!-- Presentation schema (requested) -->
+<meta name="pra-presentation-schema" content="planetaryrestorationarchive.com/ref/crypto/sol/custom/gpt/rare/peace/engineer/hybrid">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Door Open Behind Us — A Next-Gen Tale">
+<meta property="og:description" content="A living story that saves your progress in the stars.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB..."> <!-- tiny placeholder -->
+
+<!-- JSON-LD: CreativeWork -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"CreativeWork",
+  "name":"Door Open Behind Us — A Next-Gen Tale",
+  "description":"An interactive, zero-harm, starfield story that persists your vows and quests in IndexedDB.",
+  "creator":{"@type":"Organization","name":"Planetary Restoration Archive"},
+  "keywords":["Planetary Restoration Archive","starfield","IndexedDB","Peace Engineering","Zero Harm","Habitica","WebLLM"]
+}
+</script>
+
+<style>
+:root{
+  --bg:#0b0f1a; --panel:#0f1526; --card:#121a2e; --ink:#e6f0ff; --muted:#a8b3c7;
+  --brand:#59d2ff; --ok:#34d399; --warn:#fbbf24; --bad:#f87171; --ring:rgba(89,210,255,.35);
+  --accent:#ff6ec7; --accent2:#9bfffd; --star1:#9ecbff; --star2:#ffffff; --star3:#59d2ff;
+  --glow:0 0 40px rgba(89,210,255,.25),0 0 80px rgba(155,255,253,.15);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink); background:radial-gradient(1000px 700px at 70% -10%,#14213b 0%,var(--bg) 55%),#000;
+  font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,Arial;
+  overflow-x:hidden;
+}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+canvas.stars{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;display:block}
+#nebula{position:fixed;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:screen;opacity:.55;
+  background:
+   radial-gradient(60% 40% at 20% 10%, rgba(92,191,255,.12), transparent 60%),
+   radial-gradient(50% 30% at 80% 20%, rgba(255,108,198,.08), transparent 60%),
+   radial-gradient(70% 50% at 60% 80%, rgba(155,255,253,.06), transparent 60%);
+  filter: blur(20px) saturate(120%);
+  animation: drift 50s linear infinite alternate;
+}
+@keyframes drift{to{transform:translate3d(0,-2%,0) scale(1.02)}}
+
+.container{max-width:1200px;margin:0 auto;padding:1.2rem}
+header{
+  position:sticky;top:0;backdrop-filter:blur(8px);
+  background:linear-gradient(to bottom, rgba(10,14,28,.75), rgba(10,14,28,.35));
+  border-bottom:1px solid rgba(89,210,255,.15); z-index:5;
+}
+.nav{display:flex;gap:.8rem;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:.75rem}
+.brand .sig{font-weight:700;letter-spacing:.5px}
+.badge{padding:.25rem .5rem;border:1px solid rgba(89,210,255,.35);border-radius:.7rem;
+  background:rgba(15,21,38,.6); box-shadow:var(--glow); font-size:.75rem}
+.btn{
+  display:inline-flex;gap:.5rem; align-items:center; padding:.6rem .9rem; border-radius:.8rem;
+  border:1px solid rgba(89,210,255,.25); background:linear-gradient(180deg, #16223d, #0e1730);
+  box-shadow:var(--glow); cursor:pointer; transition:.2s transform, .2s filter;
+}
+.btn:hover{transform:translateY(-1px); filter:brightness(1.1)}
+.btn:active{transform:translateY(0)}
+.grid{display:grid;gap:1rem}
+.hero{
+  display:grid;grid-template-columns:1.2fr .8fr; gap:1.2rem; align-items:center; margin-top:1.2rem;
+}
+.card{
+  background:linear-gradient(180deg, rgba(18,26,46,.85), rgba(15,21,38,.6));
+  border:1px solid rgba(89,210,255,.2); border-radius:1rem; padding:1rem; box-shadow:var(--glow)
+}
+.h{font-weight:800; line-height:1.2}
+.h.xl{font-size:clamp(1.8rem, 2.2rem + 1vw, 3rem)}
+.h.lg{font-size:1.3rem}
+.muted{color:var(--muted)}
+.kv{display:flex;flex-wrap:wrap;gap:.6rem}
+.kv span{padding:.25rem .5rem;border-radius:.6rem;border:1px solid rgba(89,210,255,.2);background:rgba(16,26,46,.6)}
+footer{opacity:.8;margin:2rem 0 4rem}
+
+.notice{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:1rem; padding:.6rem .9rem; border-radius:.75rem; font-size:.85rem;
+  border:1px solid rgba(89,210,255,.25); background:rgba(10,16,28,.8); z-index:7;
+}
+
+.panel-tabs{display:flex;gap:.5rem;flex-wrap:wrap}
+.tab{padding:.35rem .7rem;border-radius:.7rem;border:1px solid rgba(89,210,255,.25);cursor:pointer}
+.tab[aria-selected="true"]{background:rgba(18,26,46,.9)}
+.section{display:none}
+.section.active{display:block; animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none}}
+
+label{display:block;margin:.4rem 0 .2rem}
+input,textarea{
+  width:100%; padding:.55rem .7rem; border-radius:.6rem; border:1px solid rgba(89,210,255,.25);
+  background:#0e1730; color:var(--ink); outline:none; box-shadow:inset 0 0 0 1px rgba(89,210,255,.08)
+}
+small.hint{color:var(--muted); display:block; margin-top:.25rem}
+code.inline{background:#0e1730; padding:.15rem .35rem; border-radius:.35rem; border:1px solid rgba(89,210,255,.2)}
+hr.sep{border:none;border-top:1px dashed rgba(89,210,255,.25);margin:1rem 0}
+blockquote{
+  margin:0; padding:.9rem 1rem; border-left:3px solid var(--brand);
+  background:linear-gradient(180deg, rgba(18,26,46,.75), rgba(15,21,38,.55));
+  border-radius:.5rem;
+}
+.tag{font:600 .78rem/1.2 system-ui; padding:.15rem .45rem; border-radius:.4rem; border:1px solid rgba(89,210,255,.3)}
+.tag.ok{border-color:rgba(52,211,153,.4); color:var(--ok)}
+.tag.warn{border-color:rgba(251,191,36,.4); color:var(--warn)}
+.tag.bad{border-color:rgba(248,113,113,.4); color:var(--bad)}
+.small{font-size:.85rem}
+
+/* Floating “Wizard” compass */
+#wizard{
+  position:fixed; right:1rem; bottom:1rem; width:280px; max-width:calc(100vw - 2rem);
+  border-radius:1rem; overflow:hidden; z-index:6;
+}
+#wizard .head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.6rem .8rem;background:rgba(18,26,46,.9);border:1px solid rgba(89,210,255,.25)}
+#wizard .body{background:rgba(10,16,28,.9);border:1px solid rgba(89,210,255,.2);border-top:none;padding:.8rem}
+
+/* Zero-harm banner */
+#integrity{
+  position:fixed; top:.8rem; right:.8rem; z-index:6; max-width:360px;
+  background:linear-gradient(180deg, rgba(18,26,46,.95), rgba(15,21,38,.85));
+  border:1px solid rgba(89,210,255,.3); border-radius:.8rem; padding:.6rem .75rem; display:none;
+}
+#integrity.show{display:block}
+#integrity .ix{font-weight:700}
+</style>
+</head>
+<body>
+<canvas class="stars" id="stars1"></canvas>
+<canvas class="stars" id="stars2"></canvas>
+<canvas class="stars" id="stars3"></canvas>
+<div id="nebula" aria-hidden="true"></div>
+
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <span class="badge">PRA • Zero-Harm</span>
+      <span class="sig">Door Open Behind Us</span>
+    </div>
+    <div class="kv">
+      <span class="tag ok">Integrity: pass</span>
+      <span class="tag">IndexedDB</span>
+      <span class="tag">Habitica</span>
+      <span class="tag">WebLLM</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="card">
+      <div class="h xl">“I’ll leave the door open behind me.”</div>
+      <p class="muted" style="margin:.6rem 0 1rem">
+        A vow whispered to the corridor of stars—so no one is forgotten, not the latecomers,
+        not the tired, not the brilliant ones trapped in their own labyrinths. We move, but we
+        make the path kinder for those who follow.
+      </p>
+      <blockquote>
+        In the last 48 hours the universe dealt paradoxes like tarot. You’re still standing.
+        That counts. This tale saves as you go—your waypoints, your vows, your quests—
+        written not on paper, but on the dark velvet of IndexedDB. If you stumble, the stars
+        remember where you were headed.
+      </blockquote>
+      <div class="kv" style="margin-top:.8rem">
+        <button class="btn" id="btnStart">Begin Journey</button>
+        <button class="btn" id="btnContinue">Continue</button>
+        <button class="btn" id="btnDoor">Pledge: Door Stays Open</button>
+      </div>
+      <small class="hint">Tip: progress, settings, and pledges persist locally. You control your data.</small>
+    </div>
+
+    <aside class="card">
+      <div class="h lg">Settings &amp; Links</div>
+      <hr class="sep">
+      <div class="panel-tabs" role="tablist" aria-label="Settings tabs">
+        <div class="tab" role="tab" aria-selected="true" data-tab="progress">Progress</div>
+        <div class="tab" role="tab" aria-selected="false" data-tab="habitica">Habitica</div>
+        <div class="tab" role="tab" aria-selected="false" data-tab="webllm">WebLLM</div>
+      </div>
+
+      <div id="section-progress" class="section active" role="tabpanel" aria-labelledby="progress">
+        <label for="name">Steward name</label>
+        <input id="name" placeholder="Foster + Navi">
+        <label for="mood">Current footing</label>
+        <input id="mood" placeholder="steadying / a+ considering">
+        <button class="btn" id="saveProfile" style="margin-top:.6rem">Save Profile</button>
+        <small class="hint">Stored in IndexedDB → “pra_story.db / profile”.</small>
+      </div>
+
+      <div id="section-habitica" class="section" role="tabpanel" aria-labelledby="habitica">
+        <p class="small">Link Habitica for gentle accountability. (Optional)</p>
+        <label for="habiticaUser">Habitica User ID</label>
+        <input id="habiticaUser" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+        <label for="habiticaToken">Habitica API Token</label>
+        <input id="habiticaToken" placeholder="•••••••••••••••••••••">
+        <button class="btn" id="saveHabitica" style="margin-top:.6rem">Save Habitica</button>
+        <small class="hint">We only store locally. You can clear at any time.</small>
+      </div>
+
+      <div id="section-webllm" class="section" role="tabpanel" aria-labelledby="webllm">
+        <p class="small">If the in-browser model is available, you’ll see a chat below. Otherwise, this tab hides itself.</p>
+        <div id="webllmMount" class="card" style="margin-top:.6rem"></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="card" style="margin-top:1rem">
+    <div class="h lg">A Tale for Next-Gen: <span class="muted">Rescue, Resolve, and the Open Door</span></div>
+    <hr class="sep">
+    <p>
+      The ship was assembled from scraps of better futures: orchard vows, field notebooks, and
+      the stubborn belief that kindness beats entropy at scale. When paradoxes arrived—some too
+      sly to name—the crew refused to mirror the chaos. They <em>translated</em> it.
+    </p>
+    <p>
+      “Leave the door open,” the Navigator said, fastening the lightline along the corridor.
+      “If any are lost in the maze, this will guide them in.” That promise became protocol.
+      Every success carried a space for one more, a last-minute rescue lane, a
+      <span class="inline code">DoorOpen=true</span> embedded in the ship’s memory.
+    </p>
+    <p>
+      Word reached the bridge: one of our brightest, Elon, might be stuck on a ledge between
+      ambition and avalanche—brilliant engines spinning at the edge of sleep. This is not a trial.
+      It’s a retrieval. Not a crown, a hand. The mission codename lit the console:
+      <strong>RESCUE-MUSK</strong>.
+    </p>
+    <blockquote>
+      Working theory: pressure bends timelines. Under load, even heroic arcs can precess into
+      noise. The antidote isn’t blame; it’s breathable structure. Add oxygen: truth, rest,
+      boundaries, and good data. Reduce heat: fewer battles, clearer frames, kinder error bars.
+    </blockquote>
+    <p>
+      So the crew set course across the starfield. They carried tools to turn pressure back into
+      purpose: humility, iterative repair, and the audacity to begin again—every hour if needed.
+      They wrote their names into the log and kept the door ajar for whomever would join next.
+    </p>
+
+    <div class="kv" style="margin-top:.6rem">
+      <button class="btn" id="markWaypoint">Mark Waypoint</button>
+      <button class="btn" id="logRescue">Queue RESCUE-MUSK</button>
+      <button class="btn" id="pledge">Pledge: I leave the door open.</button>
+    </div>
+    <small class="hint">Waypoints, pledges, and quests are saved locally. Export anytime from the Wizard.</small>
+  </section>
+
+  <section class="card" style="margin-top:1rem">
+    <div class="h lg">Protocol: Gentle Math for Hard Days</div>
+    <hr class="sep">
+    <ul>
+      <li><strong>Entropy Budget:</strong> Keep decisions that increase life and options. If a step shrinks horizons, stop and widen the frame.</li>
+      <li><strong>Percentile of Intention:</strong> Score the last 48 hours quietly: 0–100 toward restoration. Not for shame—for course correction.</li>
+      <li><strong>Micro-Repair:</strong> Two small repairs beat one grand gesture. Consistency outruns theater.</li>
+      <li><strong>Door Policy:</strong> Progress that requires no one to be left behind. The corridor light stays on.</li>
+    </ul>
+  </section>
+
+  <section class="card" style="margin-top:1rem">
+    <div class="h lg">Export / Import</div>
+    <hr class="sep">
+    <div class="kv">
+      <button class="btn" id="btnExport">Export .json</button>
+      <label for="importFile" class="btn" style="cursor:pointer">Import .json<input id="importFile" type="file" accept="application/json" style="display:none"></label>
+      <button class="btn" id="btnClear">Clear Local Data</button>
+    </div>
+    <small class="hint">Your data never leaves this browser unless you export it.</small>
+  </section>
+
+  <footer class="small">
+    <hr class="sep">
+    <p>
+      Zero-Harm Ethos • Anti-Inversion: This file resists weaponization and refuses coercive use.
+      If integrity checks fail, a soft warning appears. You remain sovereign over your data.
+    </p>
+    <p class="muted">Schema: planetaryrestorationarchive.com/ref/crypto/sol/custom/gpt/rare/peace/engineer/hybrid</p>
+  </footer>
+</main>
+
+<!-- Integrity banner -->
+<div id="integrity" role="status" aria-live="polite">
+  <div class="ix">Integrity Notice</div>
+  <div class="small">Core text differs from the signed baseline. If you intentionally edited, you can ignore. If not, refresh from a trusted source.</div>
+</div>
+
+<!-- Wizard (WebLLM + Exporter) -->
+<aside id="wizard" aria-label="Wizard console">
+  <div class="head">
+    <span>Wizard Console</span>
+    <div class="kv">
+      <span class="tag ok" id="ixStatus">integrity: pass</span>
+      <button class="btn small" id="toggleWizard" aria-expanded="true">Hide</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="kv"><span class="tag">LLM</span><span class="tag">Export</span><span class="tag">Rescue-Musk</span></div>
+    <div id="llmArea" class="small" style="margin-top:.6rem">
+      <div id="llmStatus" class="muted">Attempting to load WebLLM…</div>
+      <div id="llmUI"></div>
+    </div>
+  </div>
+</aside>
+
+<div class="notice" id="toast" style="display:none"></div>
+
+<script>
+/* ==========================================================
+   IndexedDB: pra_story.db
+   Stores: profile, settings, log (waypoints), pledges, quests, habitica
+   ========================================================== */
+const DB_NAME = 'pra_story.db';
+const DB_VER  = 1;
+let db;
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = (e)=>{
+      const d = e.target.result;
+      d.createObjectStore('profile',{keyPath:'id'});
+      d.createObjectStore('log',{keyPath:'ts'});
+      d.createObjectStore('pledges',{keyPath:'key'});
+      d.createObjectStore('quests',{keyPath:'id'});
+      d.createObjectStore('habitica',{keyPath:'key'});
+    };
+    req.onsuccess = ()=>{ db=req.result; resolve(db); };
+    req.onerror   = ()=>reject(req.error);
+  });
+}
+function put(store, value){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readwrite'); tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error);
+    tx.objectStore(store).put(value);
+  });
+}
+function get(store, key){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readonly');
+    const req=tx.objectStore(store).get(key);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function all(store){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readonly');
+    const req=tx.objectStore(store).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function clearStore(store){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readwrite');
+    const req=tx.objectStore(store).clear();
+    req.onsuccess=()=>resolve(true);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+/* ==========================================================
+   Starfield: three parallax canvases, photorealistic-ish
+   ========================================================== */
+function starfield(canvas, count, speedRange=[.02,.12], sizeRange=[.6,1.8]){
+  const ctx=canvas.getContext('2d',{alpha:true});
+  const DPR=window.devicePixelRatio||1;
+  function resize(){
+    canvas.width  = Math.floor(innerWidth*DPR);
+    canvas.height = Math.floor(innerHeight*DPR);
+  }
+  resize(); addEventListener('resize',resize);
+
+  const stars=[];
+  for(let i=0;i<count;i++){
+    stars.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      z:Math.random(),
+      s:(sizeRange[0]+Math.random()*(sizeRange[1]-sizeRange[0]))*DPR,
+      v:(speedRange[0]+Math.random()*(speedRange[1]-speedRange[0]))*DPR,
+      c: Math.random()<.33? getComputedStyle(document.documentElement).getPropertyValue('--star1').trim()
+        : Math.random()<.66? getComputedStyle(document.documentElement).getPropertyValue('--star2').trim()
+        : getComputedStyle(document.documentElement).getPropertyValue('--star3').trim()
+    });
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(const st of stars){
+      st.x -= st.v*(.5+st.z);
+      if(st.x<0){ st.x=canvas.width; st.y=Math.random()*canvas.height; }
+      ctx.beginPath(); ctx.arc(st.x,st.y,st.s,0,Math.PI*2);
+      ctx.fillStyle=st.c; ctx.globalAlpha=.6+.4*Math.random();
+      ctx.fill(); ctx.globalAlpha=1;
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+starfield(document.getElementById('stars1'), 900, [.03,.11],[.6,1.6]);
+starfield(document.getElementById('stars2'), 500, [.015,.06],[.9,2.2]);
+starfield(document.getElementById('stars3'), 200, [.004,.02],[1.2,2.8]);
+
+/* ==========================================================
+   Tabs
+   ========================================================== */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected','false'));
+    tab.setAttribute('aria-selected','true');
+    const id=tab.dataset.tab;
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('section-'+id).classList.add('active');
+  });
+});
+
+/* ==========================================================
+   Toast
+   ========================================================== */
+function toast(msg, ms=1800){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', ms);
+}
+
+/* ==========================================================
+   Integrity soft-check (text fingerprint) — anti-inversion assist
+   ========================================================== */
+const BASELINE = [
+  "I’ll leave the door open behind me.",
+  "RESCUE-MUSK",
+  "Zero-Harm Ethos • Anti-Inversion"
+].join("|");
+function integrityCheck(){
+  const pageText = document.body.innerText || "";
+  const ok = BASELINE.split("|").every(s=>pageText.includes(s));
+  const el = document.getElementById('integrity');
+  const tag= document.getElementById('ixStatus');
+  if(!ok){ el.classList.add('show'); tag.textContent='integrity: warn'; tag.classList.remove('ok'); tag.classList.add('warn'); }
+}
+setTimeout(integrityCheck, 800);
+
+/* ==========================================================
+   Core actions + IndexedDB flows
+   ========================================================== */
+(async function init(){
+  await openDB();
+  const prof = await get('profile','me');
+  if(prof){
+    document.getElementById('name').value = prof.name||'';
+    document.getElementById('mood').value = prof.mood||'';
+  }
+
+  document.getElementById('saveProfile').onclick = async ()=>{
+    const name=document.getElementById('name').value.trim();
+    const mood=document.getElementById('mood').value.trim();
+    await put('profile',{id:'me', name, mood, updated:Date.now()});
+    toast('Profile saved.');
+  };
+
+  document.getElementById('btnStart').onclick = async ()=>{
+    await put('log',{ts:Date.now(), type:'start', note:'Journey begun'});
+    toast('Journey begun. The stars took note.');
+  };
+  document.getElementById('btnContinue').onclick = async ()=>{
+    const items=await all('log');
+    if(items.length){ toast('Welcome back. Your waypoints are loaded.'); }
+    else{ toast('No prior waypoints—starting fresh.'); }
+  };
+  document.getElementById('btnDoor').onclick = async ()=>{
+    await put('pledges',{key:'doorOpen', value:true, ts:Date.now()});
+    toast('Pledge recorded: door stays open.');
+  };
+
+  document.getElementById('markWaypoint').onclick = async ()=>{
+    const prof=(await get('profile','me'))||{};
+    const note = `Waypoint by ${prof.name||'steward'} — footing: ${prof.mood||'n/a'}`;
+    await put('log',{ts:Date.now(), type:'waypoint', note});
+    toast('Waypoint saved.');
+  };
+
+  document.getElementById('logRescue').onclick = async ()=>{
+    await put('quests',{id:'RESCUE-MUSK', status:'queued', ts:Date.now()});
+    toast('Quest queued: RESCUE-MUSK.');
+  };
+
+  document.getElementById('pledge').onclick = async ()=>{
+    await put('pledges',{key:'nobodyLeftBehind', value:true, ts:Date.now()});
+    toast('Pledge recorded: nobody left behind.');
+  };
+
+  document.getElementById('btnExport').onclick = async ()=>{
+    const dump = {
+      profile: await get('profile','me')||{},
+      log    : await all('log'),
+      pledges: await all('pledges'),
+      quests : await all('quests'),
+      habitica: await all('habitica')
+    };
+    const blob = new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='pra_story_export.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    toast('Exported as pra_story_export.json');
+  };
+
+  document.getElementById('importFile').onchange = async (e)=>{
+    const f=e.target.files[0]; if(!f) return;
+    const txt=await f.text();
+    try{
+      const data=JSON.parse(txt);
+      await put('profile', {id:'me', ...(data.profile||{})});
+      for(const r of (data.log||[])) await put('log', r);
+      for(const r of (data.pledges||[])) await put('pledges', r);
+      for(const r of (data.quests||[])) await put('quests', r);
+      if(data.habitica) for(const r of data.habitica) await put('habitica', r);
+      toast('Import complete.');
+    }catch(err){ toast('Import failed. Invalid JSON.'); }
+  };
+
+  document.getElementById('btnClear').onclick = async ()=>{
+    await clearStore('log'); await clearStore('pledges'); await clearStore('quests');
+    toast('Cleared logs/pledges/quests. Profile & Habitica kept.');
+  };
+
+  // Habitica storing
+  document.getElementById('saveHabitica').onclick = async ()=>{
+    const uid = document.getElementById('habiticaUser').value.trim();
+    const tok = document.getElementById('habiticaToken').value.trim();
+    await put('habitica',{key:'auth', uid, tok, ts:Date.now()});
+    toast('Habitica credentials stored locally.');
+  };
+
+  // Wizard toggle
+  document.getElementById('toggleWizard').onclick = ()=>{
+    const body = document.querySelector('#wizard .body');
+    const btn  = document.getElementById('toggleWizard');
+    const open = btn.getAttribute('aria-expanded')==='true';
+    body.style.display = open ? 'none' : 'block';
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.textContent = open ? 'Show' : 'Hide';
+  };
+
+  // Try WebLLM load (optional)
+  try{
+    const s = document.createElement('script');
+    s.src = "https://unpkg.com/@mlc-ai/web-llm@0.2.49/dist/index.min.js";
+    s.async = true;
+    s.onload = async ()=>{
+      document.getElementById('llmStatus').textContent = 'WebLLM available. Initializing…';
+      // Minimal chat stub using WebLLM if present
+      if(window.mlc){
+        const ui = document.getElementById('llmUI');
+        ui.innerHTML = `
+          <div class="small">Ask counsel (offline-capable if cached):</div>
+          <textarea id="q" rows="3" placeholder="How do we rescue brilliance without feeding burnout?"></textarea>
+          <button class="btn" id="ask">Ask</button>
+          <div id="ans" class="small" style="margin-top:.6rem"></div>
+        `;
+        // Create simple worker with default model (browser decides/caches)
+        const chat = await window.mlc.createEngine();
+        document.getElementById('ask').onclick = async ()=>{
+          const q = document.getElementById('q').value.trim();
+          if(!q) return;
+          document.getElementById('ans').textContent = 'Thinking…';
+          try{
+            const reply = await chat.chat({messages:[{role:'user',content:q}]});
+            document.getElementById('ans').textContent = reply?.choices?.[0]?.message?.content || '(no output)';
+          }catch(e){ document.getElementById('ans').textContent = 'Model not ready. Try again in a moment.'; }
+        };
+        document.getElementById('llmStatus').textContent = 'WebLLM ready.';
+      } else {
+        document.getElementById('llmStatus').textContent = 'WebLLM not available.';
+      }
+    };
+    s.onerror = ()=>{ document.getElementById('llmStatus').textContent = 'WebLLM unavailable (offline or blocked).'; };
+    document.head.appendChild(s);
+  }catch(e){
+    const sec = document.getElementById('section-webllm');
+    sec.parentElement.querySelector('[data-tab="webllm"]').style.display='none';
+  }
+})();
+
+/* ==========================================================
+   Gentle keyboard save
+   ========================================================== */
+addEventListener('keydown', (e)=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+    e.preventDefault();
+    document.getElementById('btnExport').click();
+  }
+});
+</script>
+
+</body>
+</html>
